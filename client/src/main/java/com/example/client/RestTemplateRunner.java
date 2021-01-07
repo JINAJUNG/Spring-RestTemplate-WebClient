@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
-
+@Component
 public class RestTemplateRunner implements ApplicationRunner {
 
     @Value("${hello.server}")
@@ -18,17 +18,17 @@ public class RestTemplateRunner implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(RestTemplateRunner.class);
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         RestTemplate restTemplate = new RestTemplate();
         StopWatch stopWatch = new StopWatch();
 
         logger.debug("RestTemplate start");
         stopWatch.start();
 
-        String one = restTemplate.getForObject(url + "?second=3000", String.class);
+        String one = restTemplate.getForObject(url + "?millis=3000", String.class);
         logger.debug("api response one: {}", one);
 
-        String two = restTemplate.getForObject(url + "?second=5000", String.class);
+        String two = restTemplate.getForObject(url + "?millis=5000", String.class);
         logger.debug("api response two: {}", two);
 
         stopWatch.stop();

@@ -11,37 +11,38 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Component
-public class WebClientRunner implements ApplicationRunner {
+public class WebClientBlockRunner implements ApplicationRunner {
 
     @Value("${hello.server}")
     private String url;
 
-    private static final Logger logger = LoggerFactory.getLogger(WebClientRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebClientBlockRunner.class);
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(ApplicationArguments args) throws Exception {
         WebClient webClient = WebClient.create();
         StopWatch stopWatch = new StopWatch();
 
-        logger.debug("WebClient start");
+        logger.debug("WebClient block start");
         stopWatch.start();
 
-        Mono<String> one = webClient
+        String one = webClient
                 .get()
                 .uri(url + "?millis=5000")
                 .retrieve()
-                .bodyToMono(String.class);
-        one.subscribe(x ->
-                logger.debug("api response one: {}", x));
+                .bodyToMono(String.class)
+                .block();
+        logger.debug("api response one: {}", one);
 
-        Mono<String> two = webClient
+        String two = webClient
                 .get()
                 .uri(url + "?millis=3000")
                 .retrieve()
-                .bodyToMono(String.class);
-        two.subscribe(x -> logger.debug("api response two: {}", x));
+                .bodyToMono(String.class)
+                .block();
+        logger.debug("api response two: {}", two);
 
         stopWatch.stop();
-        logger.debug("webclient total sec: {}", stopWatch.getTotalTimeSeconds());
+        logger.debug("webclient block total sec: {}", stopWatch.getTotalTimeSeconds());
     }
 }
